@@ -54,12 +54,13 @@ router.post('/', (req, res) => {
         }else{
             console.log('success')
             Post.insert({ title, contents})
-            .then(stuff =>{
-                console.log(stuff)
-                res.status(200).json({
-                    message: "working"
-                })
+            .then(({id}) =>{
+                return Post.findById(id)
+                
             })
+            .then(res.status(200).json({
+                message: "working"
+            }))
             .catch(err => {
                res.status(500).json({
                 message: "There was an error while saving the post to the database",

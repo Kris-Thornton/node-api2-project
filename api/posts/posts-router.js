@@ -47,20 +47,18 @@ router.post('/', (req, res) => {
    
         if(!title || !contents) {
             res.status(400).json({
-             message: "Please provide title and contents for the post",
-             err: err.message,
-             stack: err.stack, 
+             message: "Please provide title and contents for the post" 
         })
         }else{
-            console.log('success')
+            
             Post.insert({ title, contents})
             .then(({id}) =>{
                 return Post.findById(id)
                 
             })
-            .then(res.status(200).json({
-                message: "working"
-            }))
+            .then(post =>{
+                res.status(201).json(post)
+            } )
             .catch(err => {
                res.status(500).json({
                 message: "There was an error while saving the post to the database",
@@ -72,9 +70,29 @@ router.post('/', (req, res) => {
         
     })
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
+    try {
+        const postDelete = await Post.findById(req.params.id)
+        
+        if (!postDelete) {
+            res.status(404).json({
+            message: "The post with the specified ID does not exist",
+        })
+        }else{
+            await Post.remove(req.params.id)
+            res.json(postDelete)
+        }
+        
+    }catch (err) {
+        res.status(500).json({
+            message: "The post could not be removed",
+            err: err.message,
+            stack: err.stack,
+        })
+    }
 
 })
+
 router.put('/:id', (req, res) => {
 
 })
